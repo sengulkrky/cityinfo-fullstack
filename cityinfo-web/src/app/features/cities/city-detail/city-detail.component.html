@@ -9,11 +9,16 @@
   <p>{{ city.description ?? 'No description available.' }}</p>
 
   <h2>Points of interest ({{ city.numberOfPointsOfInterest }})</h2>
+
+  @if (deleteError(); as error) {
+    <p role="alert">{{ error }}</p>
+  }
   <ul>
     @for (poi of city.pointsOfInterest; track poi.id) {
       <li>
         <h3>{{ poi.name }}</h3>
         <p>{{ poi.description ?? 'No description available.' }}</p>
+        <button type="button" (click)="deletePointOfInterest(poi.id, poi.name)">Delete</button>
       </li>
     } @empty {
       <li>No points of interest yet.</li>
