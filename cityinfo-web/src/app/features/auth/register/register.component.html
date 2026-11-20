@@ -1,0 +1,55 @@
+<form [formRoot]="registerForm">
+  <label>
+    Username
+    <input [formField]="registerForm.userName" autocomplete="username" />
+    @if (registerForm.userName().touched() && registerForm.userName().invalid()) {
+      @for (error of registerForm.userName().errors(); track error.kind) {
+        <small>{{ error.message }}</small>
+      }
+    }
+  </label>
+
+  <label>
+    First name
+    <input [formField]="registerForm.firstName" autocomplete="given-name" />
+    @if (registerForm.firstName().touched() && registerForm.firstName().invalid()) {
+      @for (error of registerForm.firstName().errors(); track error.kind) {
+        <small>{{ error.message }}</small>
+      }
+    }
+  </label>
+
+  <label>
+    Last name
+    <input [formField]="registerForm.lastName" autocomplete="family-name" />
+    @if (registerForm.lastName().touched() && registerForm.lastName().invalid()) {
+      @for (error of registerForm.lastName().errors(); track error.kind) {
+        <small>{{ error.message }}</small>
+      }
+    }
+  </label>
+
+  <label>
+    Password
+    <input type="password" [formField]="registerForm.password" autocomplete="new-password" />
+    @if (registerForm.password().touched() && registerForm.password().invalid()) {
+      @for (error of registerForm.password().errors(); track error.kind) {
+        <small>{{ error.message }}</small>
+      }
+    }
+  </label>
+
+  @for (error of registerForm().errors(); track error.kind) {
+    <p role="alert">{{ error.message }}</p>
+  }
+
+  <button type="submit" [disabled]="registerForm().submitting()">
+    @if (registerForm().submitting()) {
+      Registering...
+    } @else {
+      Register
+    }
+  </button>
+
+  <p>Already have an account? <a routerLink="/login">Login</a></p>
+</form>

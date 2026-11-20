@@ -1,0 +1,35 @@
+<form [formRoot]="loginForm">
+  <label>
+    Username
+    <input [formField]="loginForm.userName" autocomplete="username" />
+    @if (loginForm.userName().touched() && loginForm.userName().invalid()) {
+      @for (error of loginForm.userName().errors(); track error.kind) {
+        <small>{{ error.message }}</small>
+      }
+    }
+  </label>
+
+  <label>
+    Password
+    <input type="password" [formField]="loginForm.password" autocomplete="current-password" />
+    @if (loginForm.password().touched() && loginForm.password().invalid()) {
+      @for (error of loginForm.password().errors(); track error.kind) {
+        <small>{{ error.message }}</small>
+      }
+    }
+  </label>
+
+  @for (error of loginForm().errors(); track error.kind) {
+    <p role="alert">{{ error.message }}</p>
+  }
+
+  <button type="submit" [disabled]="loginForm().submitting()">
+    @if (loginForm().submitting()) {
+      Logging in...
+    } @else {
+      Login
+    }
+  </button>
+
+  <p>No account yet? <a routerLink="/register">Register</a></p>
+</form>

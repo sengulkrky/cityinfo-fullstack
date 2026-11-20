@@ -1,0 +1,34 @@
+<form (submit)="search($event, searchBox.value)">
+  <label>
+    Search
+    <input #searchBox type="search" [value]="searchQuery()" />
+  </label>
+  <button type="submit">Search</button>
+</form>
+
+@if (citiesResource.isLoading()) {
+  <p>Loading...</p>
+} @else if (citiesResource.error()) {
+  <p role="alert">Could not load cities.</p>
+} @else {
+  <ul>
+    @for (city of citiesResource.value()?.items; track city.id) {
+      <li>
+        <h2>{{ city.name }}</h2>
+        <p>{{ city.description ?? 'No description available.' }}</p>
+      </li>
+    } @empty {
+      <li>No cities found.</li>
+    }
+  </ul>
+
+  @if (pagination(); as p) {
+    @if (p.totalPageCount > 1) {
+      <nav aria-label="Pagination">
+        <button type="button" (click)="previousPage()" [disabled]="isFirstPage()">Previous</button>
+        <span>Page {{ p.currentPage }} of {{ p.totalPageCount }}</span>
+        <button type="button" (click)="nextPage()" [disabled]="isLastPage()">Next</button>
+      </nav>
+    }
+  }
+}

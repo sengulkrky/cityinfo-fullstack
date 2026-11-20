@@ -1,0 +1,250 @@
+@baseUrl = https://localhost:7164
+@cityId = 2
+@pointOfInterestId = 3
+
+### No token -> 401 Unauthorized
+GET {{baseUrl}}/api/v1/cities
+Accept: application/json
+
+### Log in and get a JWT
+# @name tokenRequest
+POST {{baseUrl}}/api/authentication/authenticate
+Content-Type: application/json
+
+{
+  "userName": "Sengul",
+  "password": "demo"
+}
+
+### -----------------------------------------------------
+### 0. REGISTER & LOGIN
+### -----------------------------------------------------
+
+### Register: geldige user → 201
+POST {{baseUrl}}/api/authentication/register
+Content-Type: application/json
+
+{
+  "userName": "Sengul",
+  "firstName": "Sengül",
+  "lastName": "Karakaya",
+  "password": "DemoPassword1"
+}
+
+### Register: zelfde naam met hoofdletters → verwacht 409
+POST {{baseUrl}}/api/authentication/register
+Content-Type: application/json
+
+{
+  "userName": "SENGUL",
+  "firstName": "Sengül",
+  "lastName": "Karakaya",
+  "password": "DemoPassword1"
+}
+
+### Register: wachtwoord te kort → verwacht 400
+POST {{baseUrl}}/api/authentication/register
+Content-Type: application/json
+
+{
+  "userName": "testuser",
+  "firstName": "Test",
+  "lastName": "User",
+  "password": "12345"
+}
+
+### Login: geldige user → 200 + token
+# @name loginRequest
+POST {{baseUrl}}/api/authentication/authenticate
+Content-Type: application/json
+
+{
+  "userName": "sengul",
+  "password": "DemoPassword1"
+}
+
+### Login: fout wachtwoord → 401
+POST {{baseUrl}}/api/authentication/authenticate
+Content-Type: application/json
+
+{
+  "userName": "Sengul",
+  "password": "FoutWachtwoord1"
+}
+
+### Login: onbestaande user → 401
+POST {{baseUrl}}/api/authentication/authenticate
+Content-Type: application/json
+
+{
+  "userName": "bestaatniet",
+  "password": "DemoPassword1"
+}
+
+### Steden ophalen met de echte token → 200
+GET {{baseUrl}}/api/v2/cities
+Accept: application/json
+Authorization: Bearer {{loginRequest.response.body.$.token}}
+
+
+### -----------------------------------------------------
+### 1. CITIES 
+### -----------------------------------------------------
+
+### All cities, with token -> 200
+GET {{baseUrl}}/api/v1/cities
+Accept: application/json
+Authorization: Bearer {{tokenRequest.response.body.$.token}}
+
+### Filter by name
+GET {{baseUrl}}/api/v1/cities?name=Antwerp
+Accept: application/json
+Authorization: Bearer {{tokenRequest.response.body.$.token}}
+
+### Search in name and description
+GET {{baseUrl}}/api/v1/cities?searchQuery=park
+Accept: application/json
+Authorization: Bearer {{tokenRequest.response.body.$.token}}
+
+### Paging (check the X-Pagination response header)
+GET {{baseUrl}}/api/v1/cities?pageNumber=1&pageSize=2
+Accept: application/json
+Authorization: Bearer {{tokenRequest.response.body.$.token}}
+
+### One city with its points of interest
+GET {{baseUrl}}/api/v1/cities/{{cityId}}?includePointsOfInterest=false
+Accept: application/json
+Authorization: Bearer {{tokenRequest.response.body.$.token}}
+
+### City that doesn't exist -> 404
+GET {{baseUrl}}/api/v1/cities/999
+Accept: application/json
+Authorization: Bearer {{tokenRequest.response.body.$.token}}
+
+### XML instead of JSON (content negotiation)
+GET {{baseUrl}}/api/v1/cities
+Accept: application/xml
+Authorization: Bearer {{tokenRequest.response.body.$.token}}
+
+
+### -----------------------------------------------------
+### 2. VERSIONING
+### -----------------------------------------------------
+
+### Points of interest in v1 -> 404 (only exists in v2)
+GET {{baseUrl}}/api/v1/cities/{{cityId}}/pointsofinterest
+Accept: application/json
+Authorization: Bearer {{tokenRequest.response.body.$.token}}
+
+### Points of interest in v2 -> 200 (check api-supported-versions header)
+GET {{baseUrl}}/api/v2/cities/{{cityId}}/pointsofinterest
+Accept: application/json
+Authorization: Bearer {{tokenRequest.response.body.$.token}}
+
+
+### -----------------------------------------------------
+### 3. POINTS OF INTEREST (v2)
+### -----------------------------------------------------
+
+### Create -> 201 Created + Location header
+POST {{baseUrl}}/api/v2/cities/{{cityId}}/pointsofinterest
+Content-Type: application/json
+Authorization: Bearer {{tokenRequest.response.body.$.token}}
+
+{
+  "name": "MAS",
+  "description": "Museum on the river, with a free view over the city."
+}
+
+### Create with invalid data (no name) -> 400
+POST {{baseUrl}}/api/v2/cities/{{cityId}}/pointsofinterest
+Content-Type: application/json
+Authorization: Bearer {{tokenRequest.response.body.$.token}}
+
+{
+  "description": "No name, so validation fails."
+}
+
+### Full update (PUT) -> 204
+PUT {{baseUrl}}/api/v2/cities/{{cityId}}/pointsofinterest/{{pointOfInterestId}}
+Content-Type: application/json
+Authorization: Bearer {{tokenRequest.response.body.$.token}}
+
+{
+  "name": "Cathedral of Our Lady",
+  "description": "Gothic cathedral in the centre of Antwerp."
+}
+
+### Partial update (PATCH, JSON Patch) -> 204
+PATCH {{baseUrl}}/api/v2/cities/{{cityId}}/pointsofinterest/{{pointOfInterestId}}
+Content-Type: application/json-patch+json
+Authorization: Bearer {{tokenRequest.response.body.$.token}}
+
+[
+  {
+    "op": "replace",
+    "path": "/description",
+    "value": "Only the description was changed."
+  }
+]
+
+### PATCH that removes the name -> 400
+PATCH {{baseUrl}}/api/v2/cities/{{cityId}}/pointsofinterest/{{pointOfInterestId}}
+Content-Type: application/json-patch+json
+Authorization: Bearer {{tokenRequest.response.body.$.token}}
+
+[
+  {
+    "op": "remove",
+    "path": "/name"
+  }
+]
+
+### Bulk update of all descriptions (one SQL UPDATE)
+PUT {{baseUrl}}/api/v2/cities/{{cityId}}/pointsofinterest/bulk
+Content-Type: application/json
+Authorization: Bearer {{tokenRequest.response.body.$.token}}
+
+{
+  "newDescription": "Description set by a bulk update."
+}
+
+### Delete -> 204 (check the console for the "mail")
+DELETE {{baseUrl}}/api/v2/cities/{{cityId}}/pointsofinterest/{{pointOfInterestId}}
+Authorization: Bearer {{tokenRequest.response.body.$.token}}
+
+
+### -----------------------------------------------------
+### 4. FILES
+### -----------------------------------------------------
+
+### Download (v0.1, deprecated -> check api-deprecated-versions header)
+GET {{baseUrl}}/api/v0.1/files/any-id
+Accept: application/pdf
+Authorization: Bearer {{tokenRequest.response.body.$.token}}
+
+### Upload a PDF
+POST {{baseUrl}}/api/v1/files
+Authorization: Bearer {{tokenRequest.response.body.$.token}}
+Content-Type: multipart/form-data; boundary=----CityInfoBoundary
+
+------CityInfoBoundary
+Content-Disposition: form-data; name="file"; filename="sample-file.pdf"
+Content-Type: application/pdf
+
+< ./sample-file.pdf
+------CityInfoBoundary--
+
+
+### -----------------------------------------------------
+### 5. OPENAPI DOCUMENTS
+### (Scalar UI in the browser: https://localhost:7164/scalar)
+### -----------------------------------------------------
+
+GET {{baseUrl}}/openapi/v1.json
+Accept: application/json
+
+###
+
+GET {{baseUrl}}/openapi/v2.json
+Accept: application/json

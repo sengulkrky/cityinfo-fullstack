@@ -1,0 +1,41 @@
+import { Component, computed, inject, signal } from '@angular/core';
+import { CityService } from '../../../core/services/city.service';
+import { rxResource } from '@angular/core/rxjs-interop';
+
+@Component({
+  imports: [],
+  selector: 'app-city-list',
+  styleUrl: './city-list.component.css',
+  templateUrl: './city-list.component.html',
+})
+export class CityListComponent {
+  private readonly cityService = inject(CityService);
+
+  protected readonly searchQuery = signal('');
+  protected readonly pageNumber = signal(1);
+
+  protected readonly citiesResource = rxResource({
+    params: () => ({ search: this.searchQuery(), page: this.pageNumber() }),
+    stream: ({ params }) => this.cityService.getCities(params.search, params.page),
+  });
+
+  protected readonly pagination = computed(() => this.citiesResource.value()?.pagination);
+  protected readonly isFirstPage = computed(() => this.pageNumber() <= 1);
+  protected readonly isLastPage = computed(
+    () => this.pageNumber() >= (this.pagination()?.totalPageCount ?? 1),
+  );
+
+  protected search(event: Event, query: string): void {
+    event.preventDefault();
+    this.searchQuery.set(query.trim());
+    this.pageNumber.set(1);
+  }
+
+  protected previousPage(): void {
+    this.pageNumber.update((n) => n - 1);
+  }
+
+  protected nextPage(): void {
+    this.pageNumber.update((n) => n + 1);
+  }
+}

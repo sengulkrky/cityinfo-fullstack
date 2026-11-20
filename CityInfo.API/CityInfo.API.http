@@ -1,0 +1,16 @@
+@baseUrl = https://localhost:7164
+
+### Authenticate and get JWT token
+# @name tokenRequest
+POST {{baseUrl}}/api/authentication/authenticate
+Content-Type: application/json
+
+{
+  "userName": "Sengul",
+  "password": "DemoPassword1"
+}
+
+### Get all cities, with token from previous response
+GET {{baseUrl}}/api/v2/cities
+Accept: application/json
+Authorization: Bearer {{tokenRequest.response.body.$.token}}

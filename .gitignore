@@ -1,0 +1,44 @@
+## .NET / Visual Studio
+.vs/
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.rsuser
+.idea/
+TestResults/
+*.nupkg
+project.lock.json
+
+## Node / Angular (cityinfo-web heeft daarnaast een eigen .gitignore)
+node_modules/
+.angular/
+dist/
+
+## Lokale database (wordt aangemaakt via EF Core-migrations)
+*.db
+*.db-shm
+*.db-wal
+
+## Logs
+**/logs/
+*.log
+
+## Geüploade testbestanden en cursusmateriaal
+**/uploaded_file_*.pdf
+CityInfo.API/sample-file.pdf
+CityInfo.API/CityInfo.API-original.http
+
+## Secrets – voor de zekerheid
+.env
+*.env
+appsettings.*.local.json
+secrets.json
+
+## OS
+.DS_Store
+Thumbs.db
