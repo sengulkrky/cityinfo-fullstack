@@ -1,0 +1,22 @@
+<a routerLink="/cities">← Back to cities</a>
+
+@if (cityResource.isLoading()) {
+  <p>Loading...</p>
+} @else if (cityResource.error()) {
+  <p role="alert">City not found.</p>
+} @else if (cityResource.value(); as city) {
+  <h1>{{ city.name }}</h1>
+  <p>{{ city.description ?? 'No description available.' }}</p>
+
+  <h2>Points of interest ({{ city.numberOfPointsOfInterest }})</h2>
+  <ul>
+    @for (poi of city.pointsOfInterest; track poi.id) {
+      <li>
+        <h3>{{ poi.name }}</h3>
+        <p>{{ poi.description ?? 'No description available.' }}</p>
+      </li>
+    } @empty {
+      <li>No points of interest yet.</li>
+    }
+  </ul>
+}

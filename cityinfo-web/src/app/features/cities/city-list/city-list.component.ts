@@ -1,9 +1,10 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { CityService } from '../../../core/services/city.service';
 import { rxResource } from '@angular/core/rxjs-interop';
+import { RouterLink } from '@angular/router';
 
 @Component({
-  imports: [],
+  imports: [RouterLink],
   selector: 'app-city-list',
   styleUrl: './city-list.component.css',
   templateUrl: './city-list.component.html',

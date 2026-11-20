@@ -30,4 +30,10 @@ export class CityService {
         })),
       );
   }
+
+  getCity(id: number): Observable<City> {
+    return this.http.get<City>(`${this.baseUrl}/${id}`, {
+      params: { includePointsOfInterest: true },
+    });
+  }
 }
