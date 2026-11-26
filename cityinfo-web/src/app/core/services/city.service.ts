@@ -3,7 +3,7 @@ import { map, Observable } from 'rxjs';
 import { PagedResult, Pagination } from '../../models/pagination.model';
 import { City, CityWithoutPointsOfInterest } from '../../models/city.model';
 import { environment } from '../../../environments/environment';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, httpResource, HttpResourceRef } from '@angular/common/http';
 
 @Service()
 export class CityService {
@@ -31,9 +31,12 @@ export class CityService {
       );
   }
 
-  getCity(id: number): Observable<City> {
-    return this.http.get<City>(`${this.baseUrl}/${id}`, {
+  // Geeft een httpResource terug: de request loopt opnieuw zodra het id-signal verandert.
+  // Moet aangeroepen worden in een injection context (bv. een veld-initializer van een component).
+  getCity(id: () => number): HttpResourceRef<City | undefined> {
+    return httpResource<City>(() => ({
+      url: `${this.baseUrl}/${id()}`,
       params: { includePointsOfInterest: true },
-    });
+    }));
   }
 }

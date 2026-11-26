@@ -1,6 +1,5 @@
 import { Component, inject, input, numberAttribute, signal } from '@angular/core';
 import { CityService } from '../../../core/services/city.service';
-import { rxResource } from '@angular/core/rxjs-interop';
 import { PointOfInterestService } from '../../../core/services/point-of-interest.service';
 import { firstValueFrom } from 'rxjs';
 import { RouterLink } from '@angular/router';
@@ -17,10 +16,7 @@ export class CityDetailComponent {
 
   readonly id = input.required<number, string>({ transform: numberAttribute });
 
-  protected readonly cityResource = rxResource({
-    params: () => this.id(),
-    stream: ({ params: id }) => this.cityService.getCity(id),
-  });
+  protected readonly cityResource = this.cityService.getCity(this.id);
 
   protected readonly deleteError = signal<string | null>(null);
 
