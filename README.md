@@ -1,25 +1,25 @@
 # CityInfo – ASP.NET Core 10 Web API + Angular
 
-Full-stack oefenproject: een REST API voor steden en hun bezienswaardigheden, met een Angular-front-end om in te loggen, te registreren en steden te bekijken.
+Full-stack practice project: a REST API for cities and their points of interest, with an Angular front-end to log in, register and browse cities.
 
-De API is gebaseerd op de Pluralsight-cursus **"Getting Started with ASP.NET Core 10 Web API"** en uitgebreid met eigen functionaliteit. De Angular-front-end heb ik zelf gebouwd.
+The API is based on the Pluralsight course **"Getting Started with ASP.NET Core 10 Web API"** and extended with my own features. I built the Angular front-end myself.
 
-## Wat ik zelf heb toegevoegd
+## What I added myself
 
 **Back-end**
-- Echte gebruikersregistratie en login in plaats van een hardgecodeerde demogebruiker
-- `User`-entiteit met unieke gebruikersnaam + EF Core-migration
-- Wachtwoorden gehasht met ASP.NET Core `PasswordHasher<User>`
-- `UserService` en `UserRepository` (business logic gescheiden van data-access)
-- Genormaliseerde gebruikersnamen (case-insensitive) met `409 Conflict` bij duplicaten
-- CORS-policy voor de Angular-client
+- Real user registration and login instead of a hard-coded demo user
+- `User` entity with a unique username + EF Core migration
+- Passwords hashed with ASP.NET Core `PasswordHasher<User>`
+- `UserService` and `UserRepository` (business logic separated from data access)
+- Normalized usernames (case-insensitive) with `409 Conflict` on duplicates
+- CORS policy for the Angular client
 
 **Front-end (Angular 22)**
-- Login- en registratieformulieren met signal forms en validatie
-- `AuthService` die de JWT bewaart en de vervaldatum controleert
-- HTTP-interceptor die automatisch de Bearer-token meestuurt en bij `401` uitlogt
-- Route guard die beveiligde pagina's afschermt
-- Stedenlijst met zoeken en paginering (via de `X-Pagination`-header)
+- Login and registration forms with signal forms and validation
+- `AuthService` that stores the JWT and checks its expiry date
+- HTTP interceptor that automatically sends the Bearer token and logs out on `401`
+- Route guard that protects secured pages
+- City list with search and pagination (via the `X-Pagination` header)
 
 ## Tech stack
 
@@ -27,13 +27,13 @@ De API is gebaseerd op de Pluralsight-cursus **"Getting Started with ASP.NET Cor
 |---|---|
 | .NET 10, ASP.NET Core Web API | Angular 22, TypeScript |
 | Entity Framework Core + SQLite | Signal forms, standalone components |
-| JWT-authenticatie | HttpClient, interceptors, guards |
+| JWT authentication | HttpClient, interceptors, guards |
 | API versioning, AutoMapper | |
 | Serilog, OpenAPI + Scalar | |
 
-## Lokaal starten
+## Running locally
 
-### Vereisten
+### Requirements
 - .NET 10 SDK
 - Node.js + Angular CLI
 - EF Core tools: `dotnet tool install --global dotnet-ef`
@@ -43,18 +43,18 @@ De API is gebaseerd op de Pluralsight-cursus **"Getting Started with ASP.NET Cor
 ```powershell
 cd CityInfo.API
 
-# JWT-signing key instellen (wordt NIET in de repo bewaard)
+# Set the JWT signing key (NOT stored in the repo)
 $key = [Convert]::ToBase64String([System.Security.Cryptography.RandomNumberGenerator]::GetBytes(32))
 dotnet user-secrets set "Authentication:SecretForKey" $key
 
-# database aanmaken
+# Create the database
 dotnet ef database update
 
-# starten
+# Start
 dotnet run --launch-profile https
 ```
 
-De API draait op `https://localhost:7164`. API-documentatie (Scalar): `https://localhost:7164/scalar`.
+The API runs on `https://localhost:7164`. API documentation (Scalar): `https://localhost:7164/scalar`.
 
 ### 2. Front-end
 
@@ -64,24 +64,24 @@ npm install
 ng serve
 ```
 
-Open `http://localhost:4200`, registreer een gebruiker en log in.
+Open `http://localhost:4200`, register a user and log in.
 
-### Testen met .http-bestanden
-`CityInfo.API/CityInfo.API-demo.http` bevat requests voor registratie, login en alle endpoints (te gebruiken in Visual Studio of VS Code met de REST Client-extensie).
+### Testing with .http files
+`CityInfo.API/CityInfo.API-demo.http` contains requests for registration, login and all endpoints (usable in Visual Studio, or in VS Code with the REST Client extension).
 
-## Projectstructuur
+## Project structure
 
 ```
 CityInfo/
 ├── CityInfo.API/        ASP.NET Core Web API
 │   ├── Controllers/     endpoints
 │   ├── Services/        business logic + repositories
-│   ├── Entities/        EF Core-entiteiten
-│   ├── Models/          DTO's
-│   ├── Profiles/        AutoMapper-profielen
+│   ├── Entities/        EF Core entities
+│   ├── Models/          DTOs
+│   ├── Profiles/        AutoMapper profiles
 │   ├── DbContexts/      CityInfoContext + seed data
 │   └── Migrations/
-└── cityinfo-web/        Angular-client
+└── cityinfo-web/        Angular client
     └── src/app/
         ├── core/        services, interceptor, guard
         ├── features/    auth (login/register), cities
