@@ -4,38 +4,45 @@
   <h1>New point of interest</h1>
 }
 
-<form [formRoot]="poiForm">
-  <label>
-    Name
-    <input [formField]="poiForm.name" />
-    @if (poiForm.name().touched() && poiForm.name().invalid()) {
-      @for (error of poiForm.name().errors(); track error.kind) {
-        <small>{{ error.message }}</small>
+@if (poiResource.isLoading()) {
+  <p>Loading...</p>
+} @else if (poiResource.error()) {
+  <p role="alert">Point of interest not found.</p>
+  <a [routerLink]="['/cities', id()]">Back to city</a>
+} @else {
+  <form [formRoot]="poiForm">
+    <label>
+      Name
+      <input [formField]="poiForm.name" />
+      @if (poiForm.name().touched() && poiForm.name().invalid()) {
+        @for (error of poiForm.name().errors(); track error.kind) {
+          <small>{{ error.message }}</small>
+        }
       }
-    }
-  </label>
+    </label>
 
-  <label>
-    Description
-    <textarea [formField]="poiForm.description"></textarea>
-    @if (poiForm.description().touched() && poiForm.description().invalid()) {
-      @for (error of poiForm.description().errors(); track error.kind) {
-        <small>{{ error.message }}</small>
+    <label>
+      Description
+      <textarea [formField]="poiForm.description"></textarea>
+      @if (poiForm.description().touched() && poiForm.description().invalid()) {
+        @for (error of poiForm.description().errors(); track error.kind) {
+          <small>{{ error.message }}</small>
+        }
       }
+    </label>
+
+    @for (error of poiForm().errors(); track error.kind) {
+      <p role="alert">{{ error.message }}</p>
     }
-  </label>
 
-  @for (error of poiForm().errors(); track error.kind) {
-    <p role="alert">{{ error.message }}</p>
-  }
+    <button type="submit" [disabled]="poiForm().submitting()">
+      @if (poiForm().submitting()) {
+        Saving...
+      } @else {
+        Save
+      }
+    </button>
 
-  <button type="submit" [disabled]="poiForm().submitting()">
-    @if (poiForm().submitting()) {
-      Saving...
-    } @else {
-      Save
-    }
-  </button>
-
-  <a [routerLink]="['/cities', id()]">Cancel</a>
-</form>
+    <a [routerLink]="['/cities', id()]">Cancel</a>
+  </form>
+}

@@ -45,7 +45,7 @@ export class PoiFormComponent {
   });
 
   protected readonly poiModel = linkedSignal<PoiFormModel>(() => {
-    const poi = this.poiResource.value();
+    const poi = this.poiResource.hasValue() ? this.poiResource.value() : undefined;
     return {
       name: poi?.name ?? '',
       description: poi?.description ?? '',
