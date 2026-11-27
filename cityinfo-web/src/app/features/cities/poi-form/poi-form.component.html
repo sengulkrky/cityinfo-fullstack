@@ -7,7 +7,7 @@
 @if (poiResource.isLoading()) {
   <p>Loading...</p>
 } @else if (poiResource.error()) {
-  <p role="alert">Point of interest not found.</p>
+  <p role="alert">{{ errorMessage() }}</p>
   <a [routerLink]="['/cities', id()]">Back to city</a>
 } @else {
   <form [formRoot]="poiForm">

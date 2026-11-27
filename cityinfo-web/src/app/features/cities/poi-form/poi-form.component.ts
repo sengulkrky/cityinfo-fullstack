@@ -13,6 +13,7 @@ import { PointOfInterestService } from '../../../core/services/point-of-interest
 import { PointOfInterestRequest } from '../../../models/point-of-interest.model';
 import { firstValueFrom } from 'rxjs';
 import { rxResource } from '@angular/core/rxjs-interop';
+import { HttpErrorResponse } from '@angular/common/http';
 
 interface PoiFormModel {
   name: string;
@@ -42,6 +43,20 @@ export class PoiFormComponent {
     },
     stream: ({ params }) =>
       this.pointOfInterestService.getPointOfInterest(params.cityId, params.poiId),
+  });
+
+  protected readonly errorMessage = computed(() => {
+    const error = this.poiResource.error();
+
+    if (error instanceof HttpErrorResponse) {
+      if (error.status === 404) {
+        return 'Point of interest not found.';
+      }
+      if (error.status === 0) {
+        return 'Cannot reach the server. Please try again later.';
+      }
+    }
+    return 'Something went wrong. Please try again.';
   });
 
   protected readonly poiModel = linkedSignal<PoiFormModel>(() => {

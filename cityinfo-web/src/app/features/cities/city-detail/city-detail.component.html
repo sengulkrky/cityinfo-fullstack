@@ -29,7 +29,7 @@
   </ul>
   <a [routerLink]="['/cities', city.id, 'points-of-interest', 'new']">Add new point of interest</a>
 } @else if (cityResource.error()) {
-  <p role="alert">City not found.</p>
+  <p role="alert">{{ errorMessage() }}</p>
 } @else {
   <p>Loading...</p>
 }

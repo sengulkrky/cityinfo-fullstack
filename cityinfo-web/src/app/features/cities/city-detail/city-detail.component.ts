@@ -1,8 +1,9 @@
-import { Component, inject, input, numberAttribute, signal } from '@angular/core';
+import { Component, computed, inject, input, numberAttribute, signal } from '@angular/core';
 import { CityService } from '../../../core/services/city.service';
 import { PointOfInterestService } from '../../../core/services/point-of-interest.service';
 import { firstValueFrom } from 'rxjs';
 import { RouterLink } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   imports: [RouterLink],
@@ -19,6 +20,20 @@ export class CityDetailComponent {
   protected readonly cityResource = this.cityService.getCity(this.id);
 
   protected readonly deleteError = signal<string | null>(null);
+
+  protected readonly errorMessage = computed(() => {
+    const error = this.cityResource.error();
+
+    if (error instanceof HttpErrorResponse) {
+      if (error.status === 404) {
+        return 'City not found.';
+      }
+      if (error.status === 0) {
+        return 'Cannot reach the server. Please try again later.';
+      }
+    }
+    return 'Something went wrong. Please try again.';
+  });
 
   protected async deletePointOfInterest(poiId: number, poiName: string): Promise<void> {
     if (!confirm(`Are you sure you want to delete ${poiName}?`)) {
