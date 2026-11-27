@@ -1,4 +1,4 @@
-import { inject, Service } from '@angular/core';
+import { computed, inject, Service, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
@@ -14,28 +14,10 @@ export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/authentication`;
   private readonly tokenKey = 'cityinfo_token';
+  private readonly token = signal<string | null>(localStorage.getItem(this.tokenKey));
 
-  register(request: RegisterRequest): Observable<User> {
-    return this.http.post<User>(`${this.baseUrl}/register`, request);
-  }
-
-  login(request: AuthenticationRequest): Observable<AuthenticationResponse> {
-    // als het antwoord binnenkomt, noem het response en sla response.token op onder mijn key
-    return this.http
-      .post<AuthenticationResponse>(`${this.baseUrl}/authenticate`, request)
-      .pipe(tap((response) => localStorage.setItem(this.tokenKey, response.token)));
-  }
-
-  getToken(): string | null {
-    return localStorage.getItem(this.tokenKey);
-  }
-
-  logout(): void {
-    localStorage.removeItem(this.tokenKey);
-  }
-
-  isLoggedIn(): boolean {
-    const token = this.getToken();
+  readonly isLoggedIn = computed(() => {
+    const token = this.token();
 
     if (!token) {
       return false;
@@ -50,5 +32,28 @@ export class AuthService {
     } catch {
       return false;
     }
+  });
+
+  register(request: RegisterRequest): Observable<User> {
+    return this.http.post<User>(`${this.baseUrl}/register`, request);
+  }
+
+  login(request: AuthenticationRequest): Observable<AuthenticationResponse> {
+    // als het antwoord binnenkomt, noem het response en sla response.token op onder mijn key
+    return this.http.post<AuthenticationResponse>(`${this.baseUrl}/authenticate`, request).pipe(
+      tap((response) => {
+        localStorage.setItem(this.tokenKey, response.token);
+        this.token.set(response.token);
+      }),
+    );
+  }
+
+  getToken(): string | null {
+    return this.token();
+  }
+
+  logout(): void {
+    localStorage.removeItem(this.tokenKey);
+    this.token.set(null);
   }
 }
