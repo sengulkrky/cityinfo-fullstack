@@ -1,1 +1,27 @@
-<h1>New point of interest for city {{ id() }}</h1>
+<h1>New point of interest</h1>
+
+<form [formRoot]="poiForm">
+  <label>
+    name
+    <input [formField]="poiForm.name" />
+    @if (poiForm.name().touched() && poiForm.name().invalid()) {
+      @for (error of poiForm.name().errors(); track error.kind) {
+        <small>{{ error.message }}</small>
+      }
+    }
+  </label>
+
+  <label>
+    Description
+    <textarea [formField]="poiForm.description"></textarea>
+    @if (poiForm.description().touched() && poiForm.description().invalid()) {
+      @for (error of poiForm.description().errors(); track error.kind) {
+        <small>{{ error.message }}</small>
+      }
+    }
+  </label>
+
+  <button type="submit">Save</button>
+
+  <a [routerLink]="['/cities', id()]">Cancel</a>
+</form>
