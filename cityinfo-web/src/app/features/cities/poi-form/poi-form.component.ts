@@ -76,9 +76,18 @@ export class PoiFormComponent {
           };
 
           try {
-            await firstValueFrom(
-              this.pointOfInterestService.createPointOfInterest(this.id(), request),
-            );
+            const poiId = this.poiId();
+
+            if (poiId === undefined) {
+              await firstValueFrom(
+                this.pointOfInterestService.createPointOfInterest(this.id(), request),
+              );
+            } else {
+              await firstValueFrom(
+                this.pointOfInterestService.updatePointOfInterest(this.id(), poiId, request),
+              );
+            }
+
             this.router.navigate(['/cities', this.id()]);
             return;
           } catch {
