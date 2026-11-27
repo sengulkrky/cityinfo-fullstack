@@ -8,6 +8,4 @@ import { HeaderComponent } from './core/layout/header/header.component';
   styleUrl: './app.css',
   templateUrl: './app.html',
 })
-export class App {
-  protected readonly title = signal('cityinfo-web');
-}
+export class App {}
