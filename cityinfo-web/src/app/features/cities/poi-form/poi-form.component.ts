@@ -1,5 +1,5 @@
 import { Component, inject, input, numberAttribute, signal } from '@angular/core';
-import { form, maxLength, required, FormRoot, FormField } from '@angular/forms/signals';
+import { form, maxLength, required, FormRoot, FormField, validate } from '@angular/forms/signals';
 import { Router, RouterLink } from '@angular/router';
 import { PointOfInterestService } from '../../../core/services/point-of-interest.service';
 import { PointOfInterestRequest } from '../../../models/point-of-interest.model';
@@ -30,6 +30,12 @@ export class PoiFormComponent {
     this.poiModel,
     (schema) => {
       required(schema.name, { message: 'Name is required' });
+      validate(schema.name, ({ value }) => {
+        if (value() !== '' && value().trim() === '') {
+          return { kind: 'whitespace', message: 'Name cannot be only spaces' };
+        }
+        return undefined;
+      });
       maxLength(schema.name, 50, { message: 'Name can be at most 50 characters' });
       maxLength(schema.description, 200, { message: 'Description can be at most 200 characters' });
     },
