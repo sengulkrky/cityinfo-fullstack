@@ -1,6 +1,9 @@
-import { Component, input, numberAttribute, signal } from '@angular/core';
+import { Component, inject, input, numberAttribute, signal } from '@angular/core';
 import { form, maxLength, required, FormRoot, FormField } from '@angular/forms/signals';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { PointOfInterestService } from '../../../core/services/point-of-interest.service';
+import { PointOfInterestRequest } from '../../../models/point-of-interest.model';
+import { firstValueFrom } from 'rxjs';
 
 interface PoiFormModel {
   name: string;
@@ -14,6 +17,8 @@ interface PoiFormModel {
   templateUrl: './poi-form.component.html',
 })
 export class PoiFormComponent {
+  private readonly pointOfInterestService = inject(PointOfInterestService);
+  private readonly router = inject(Router);
   readonly id = input.required<number, string>({ transform: numberAttribute });
 
   protected readonly poiModel = signal<PoiFormModel>({
@@ -21,9 +26,37 @@ export class PoiFormComponent {
     description: '',
   });
 
-  protected readonly poiForm = form(this.poiModel, (schema) => {
-    required(schema.name, { message: 'Name is required' });
-    maxLength(schema.name, 50, { message: 'Name can be at most 50 characters' });
-    maxLength(schema.description, 200, { message: 'Description can be at most 200 characters' });
-  });
+  protected readonly poiForm = form(
+    this.poiModel,
+    (schema) => {
+      required(schema.name, { message: 'Name is required' });
+      maxLength(schema.name, 50, { message: 'Name can be at most 50 characters' });
+      maxLength(schema.description, 200, { message: 'Description can be at most 200 characters' });
+    },
+    {
+      submission: {
+        action: async (field) => {
+          const value = field().value();
+
+          const request: PointOfInterestRequest = {
+            name: value.name.trim(),
+            description: value.description.trim() || null,
+          };
+
+          try {
+            await firstValueFrom(
+              this.pointOfInterestService.createPointOfInterest(this.id(), request),
+            );
+            this.router.navigate(['/cities', this.id()]);
+            return;
+          } catch {
+            return {
+              kind: 'serverError',
+              message: 'Could not save the point of interest. Please try again.',
+            };
+          }
+        },
+      },
+    },
+  );
 }

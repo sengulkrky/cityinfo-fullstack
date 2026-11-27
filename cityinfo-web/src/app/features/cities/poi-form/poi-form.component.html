@@ -2,7 +2,7 @@
 
 <form [formRoot]="poiForm">
   <label>
-    name
+    Name
     <input [formField]="poiForm.name" />
     @if (poiForm.name().touched() && poiForm.name().invalid()) {
       @for (error of poiForm.name().errors(); track error.kind) {
@@ -21,7 +21,17 @@
     }
   </label>
 
-  <button type="submit">Save</button>
+  @for (error of poiForm().errors(); track error.kind) {
+    <p role="alert">{{ error.message }}</p>
+  }
+
+  <button type="submit" [disabled]="poiForm().submitting()">
+    @if (poiForm().submitting()) {
+      Saving...
+    } @else {
+      Save
+    }
+  </button>
 
   <a [routerLink]="['/cities', id()]">Cancel</a>
 </form>
