@@ -31,8 +31,6 @@ export class CityService {
       );
   }
 
-  // Geeft een httpResource terug: de request loopt opnieuw zodra het id-signal verandert.
-  // Moet aangeroepen worden in een injection context (bv. een veld-initializer van een component).
   getCity(id: () => number): HttpResourceRef<City | undefined> {
     return httpResource<City>(() => ({
       url: `${this.baseUrl}/${id()}`,

@@ -4,6 +4,7 @@ import { RegisterComponent } from './features/auth/register/register.component';
 import { CityListComponent } from './features/cities/city-list/city-list.component';
 import { authGuard } from './core/guards/auth.guard';
 import { CityDetailComponent } from './features/cities/city-detail/city-detail.component';
+import { PoiFormComponent } from './features/cities/poi-form/poi-form.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'cities', pathMatch: 'full' },
@@ -11,5 +12,10 @@ export const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'cities', component: CityListComponent, canActivate: [authGuard] },
   { path: 'cities/:id', component: CityDetailComponent, canActivate: [authGuard] },
+  {
+    path: 'cities/:id/points-of-interest/new',
+    component: PoiFormComponent,
+    canActivate: [authGuard],
+  },
   { path: '**', redirectTo: 'cities' },
 ];
