@@ -20,7 +20,9 @@ export class CityListComponent {
     stream: ({ params }) => this.cityService.getCities(params.search, params.page),
   });
 
-  protected readonly pagination = computed(() => this.citiesResource.value()?.pagination);
+  protected readonly pagination = computed(() =>
+    this.citiesResource.hasValue() ? this.citiesResource.value()?.pagination : undefined,
+  );
   protected readonly isFirstPage = computed(() => this.pageNumber() <= 1);
   protected readonly isLastPage = computed(
     () => this.pageNumber() >= (this.pagination()?.totalPageCount ?? 1),

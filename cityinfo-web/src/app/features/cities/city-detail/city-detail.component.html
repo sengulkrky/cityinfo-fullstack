@@ -1,10 +1,12 @@
 <a routerLink="/cities">← Back to cities</a>
 
-@if (cityResource.isLoading()) {
-  <p>Loading...</p>
-} @else if (cityResource.error()) {
-  <p role="alert">City not found.</p>
-} @else if (cityResource.value(); as city) {
+@if (cityResource.hasValue()) {
+  @let city = cityResource.value();
+
+  @if (cityResource.isLoading()) {
+    <small>Updating...</small>
+  }
+
   <h1>{{ city.name }}</h1>
   <p>{{ city.description ?? 'No description available.' }}</p>
 
@@ -18,12 +20,16 @@
       <li>
         <h3>{{ poi.name }}</h3>
         <p>{{ poi.description ?? 'No description available.' }}</p>
-        <button type="button" (click)="deletePointOfInterest(poi.id, poi.name)">Delete</button>
         <a [routerLink]="['/cities', city.id, 'points-of-interest', poi.id, 'edit']">Edit</a>
+        <button type="button" (click)="deletePointOfInterest(poi.id, poi.name)">Delete</button>
       </li>
     } @empty {
       <li>No points of interest yet.</li>
     }
   </ul>
   <a [routerLink]="['/cities', city.id, 'points-of-interest', 'new']">Add new point of interest</a>
+} @else if (cityResource.error()) {
+  <p role="alert">City not found.</p>
+} @else {
+  <p>Loading...</p>
 }
