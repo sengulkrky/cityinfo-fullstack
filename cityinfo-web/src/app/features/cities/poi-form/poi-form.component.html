@@ -1,4 +1,8 @@
-<h1>New point of interest</h1>
+@if (isEdit()) {
+  <h1>Edit point of interest</h1>
+} @else {
+  <h1>New point of interest</h1>
+}
 
 <form [formRoot]="poiForm">
   <label>

@@ -1,4 +1,4 @@
-import { Component, inject, input, numberAttribute, signal } from '@angular/core';
+import { Component, computed, inject, input, numberAttribute, signal } from '@angular/core';
 import { form, maxLength, required, FormRoot, FormField, validate } from '@angular/forms/signals';
 import { Router, RouterLink } from '@angular/router';
 import { PointOfInterestService } from '../../../core/services/point-of-interest.service';
@@ -19,7 +19,13 @@ interface PoiFormModel {
 export class PoiFormComponent {
   private readonly pointOfInterestService = inject(PointOfInterestService);
   private readonly router = inject(Router);
+
   readonly id = input.required<number, string>({ transform: numberAttribute });
+  readonly poiId = input(undefined, {
+    transform: (value: string | undefined) => (value ? Number(value) : undefined),
+  });
+
+  protected readonly isEdit = computed(() => this.poiId() !== undefined);
 
   protected readonly poiModel = signal<PoiFormModel>({
     name: '',

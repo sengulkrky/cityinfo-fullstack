@@ -17,5 +17,10 @@ export const routes: Routes = [
     component: PoiFormComponent,
     canActivate: [authGuard],
   },
+  {
+    path: 'cities/:id/points-of-interest/:poiId/edit',
+    component: PoiFormComponent,
+    canActivate: [authGuard],
+  },
   { path: '**', redirectTo: 'cities' },
 ];
