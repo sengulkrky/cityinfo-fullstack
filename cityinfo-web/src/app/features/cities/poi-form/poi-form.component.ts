@@ -1,9 +1,18 @@
-import { Component, computed, inject, input, numberAttribute, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  input,
+  linkedSignal,
+  numberAttribute,
+  signal,
+} from '@angular/core';
 import { form, maxLength, required, FormRoot, FormField, validate } from '@angular/forms/signals';
 import { Router, RouterLink } from '@angular/router';
 import { PointOfInterestService } from '../../../core/services/point-of-interest.service';
 import { PointOfInterestRequest } from '../../../models/point-of-interest.model';
 import { firstValueFrom } from 'rxjs';
+import { rxResource } from '@angular/core/rxjs-interop';
 
 interface PoiFormModel {
   name: string;
@@ -26,10 +35,21 @@ export class PoiFormComponent {
   });
 
   protected readonly isEdit = computed(() => this.poiId() !== undefined);
+  protected readonly poiResource = rxResource({
+    params: () => {
+      const poiId = this.poiId();
+      return poiId === undefined ? undefined : { cityId: this.id(), poiId };
+    },
+    stream: ({ params }) =>
+      this.pointOfInterestService.getPointOfInterest(params.cityId, params.poiId),
+  });
 
-  protected readonly poiModel = signal<PoiFormModel>({
-    name: '',
-    description: '',
+  protected readonly poiModel = linkedSignal<PoiFormModel>(() => {
+    const poi = this.poiResource.value();
+    return {
+      name: poi?.name ?? '',
+      description: poi?.description ?? '',
+    };
   });
 
   protected readonly poiForm = form(
